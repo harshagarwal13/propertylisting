@@ -23,7 +23,7 @@ This is a simple property management system API built using FastAPI. It allows u
 2. Navigate to the project directory:
 
     ```bash
-   cd property-management-api
+   cd propertylisting
 3. Install dependencies:
 
     ```bash
