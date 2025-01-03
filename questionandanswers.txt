@@ -1,0 +1,149 @@
+1. Data Structure Design
+
+1.1 Property Listings Data
+Structure: Dictionary/HashMap
+Data Structure: Hashmap
+properties = {
+    "property_id_1": {
+        "user_id": "user_1",
+        "details": {
+            "location": "Pune",
+            "price": 500000,
+            "property_type": "Apartment",
+            "description": "A beautiful apartment in Pune.",
+            "amenities": ["Gym", "Pool"]
+        },
+        "status": "available",
+        "timestamp": datetime.datetime(2025, 1, 1, 12, 0)
+    }
+}
+Justification:
+Fast Lookups: Using a dictionary (HashMap) allows O(1) time complexity for accessing property details by property_id.
+Scalability: Handles large-scale property data efficiently.
+
+
+1.2 User Portfolios
+Structure: Dictionary of Lists
+Data Structure:
+user_portfolios = {
+    "user_1": ["property_id_1", "property_id_3"],
+    "user_2": ["property_id_2"]
+}
+Justification:
+Simplicity: Allows easy retrieval of all properties owned by a user in O(1) time.
+Ease of Updates: Adding/removing a property is efficient.
+
+
+1.3 Shortlisted Properties
+Structure: Dictionary of Lists
+Data Structure:
+shortlisted_properties = {
+    "user_1": ["property_id_4", "property_id_5"],
+    "user_2": ["property_id_1", "property_id_6"]
+}
+Justification:
+User-Specific: Each user has their own list of shortlisted properties.
+Efficient Retrieval: Fetching shortlisted properties for a user is O(1).
+
+
+1.4 Search Indices
+Structure: Multi-Level Dictionaries
+Data Structure:
+search_index = {
+    "location": {
+        "Pune": ["property_id_1", "property_id_3"],
+        "Mumbai": ["property_id_2"]
+    },
+    "price": SortedDict({
+        100000: ["property_id_5"],
+        500000: ["property_id_1"],
+        750000: ["property_id_2"]
+    }),
+    "property_type": {
+        "Apartment": ["property_id_1", "property_id_3"],
+        "House": ["property_id_2"]
+    },
+    "status": {
+        "available": ["property_id_1", "property_id_2"],
+        "sold": ["property_id_5"]
+    }
+}
+Justification:
+Efficient Filtering: Multi-level indices allow quick lookups for criteria-based searches.
+SortedDict: For price filtering, a sorted dictionary enables efficient range queries in O(log n).
+Handling Property Status Updates
+Update Property Object:
+Modify the status field in the properties dictionary.
+Update Search Index:
+Remove the property_id from the previous status list and add it to the new status list in the search_index["status"] dictionary.
+Impact:
+Consistency across data structures.
+Minimal overhead due to efficient O(1) operations.
+
+
+
+2. Search/Sort Implementation Strategy
+2.1 Price Range Filtering
+Approach: Use the SortedDict for price in the search_index.
+
+Steps:
+
+Use the bisect_left and bisect_right methods to find all properties within the price range.
+Merge the results with other filters (if any).
+Time Complexity:
+O(log n) for range query + O(k) for fetching k results.
+
+2.2 Location-Based Search
+Approach: Use the search_index["location"].
+
+Steps:
+
+Fetch all properties for the given location in O(1) time.
+Combine with other filters like price or type.
+Time Complexity:
+O(1) for location-based filtering.
+
+2.3 Multiple Criteria Sorting
+Approach:
+
+Apply each filter sequentially (price, location, property type).
+Use Python’s sorted() with a custom key for multi-criteria sorting.
+sorted_results = sorted(
+    filtered_properties,
+    key=lambda x: (x["price"], x["timestamp"]),
+    reverse=False
+)
+Justification:
+
+Sorting by multiple criteria like price (ascending) and timestamp (descending) is efficient.
+Time Complexity:
+O(n log n) for sorting, where n is the number of filtered properties.
+
+2.4 Search Result Pagination
+Approach:
+
+Slice the filtered and sorted results using pagination logic:
+start = (page - 1) * limit
+end = start + limit
+paginated_results = results[start:end]
+Return the paginated subset of properties.
+Time Complexity:
+O(k) for slicing, where k is the page size (limit).
+
+2.5 Performance Considerations
+Indexing:
+Use multi-level dictionaries for efficient filtering.
+Leverage SortedDict for range queries on numeric data (e.g., price).
+Caching:
+Cache frequent queries (e.g., popular locations) to reduce computation time.
+Concurrency:
+Use thread-safe data structures or databases to handle concurrent updates and searches.
+Sharding:
+Distribute property data across multiple servers for scalability.
+Indexing Strategy
+Primary Index: Property ID (used in properties dictionary).
+Secondary Indices:
+Location: For location-based filtering.
+Price: Sorted dictionary for range queries.
+Status: Efficient filtering for "available" or "sold."
+Property Type: For type-based filtering.
